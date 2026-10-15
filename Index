@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#16161a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>سِراج — أدوات المطوّر</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap">
+<style>
+:root{--bg:#f6f2e9;--panel:#fffdf8;--ink:#23211c;--mute:#7a7467;--gold:#8a6a1f;--line:#e2dac6;--ok:#2f7a4d;--bad:#b3402f;--mark:#f0dca0;--num:#2b5aa8;--addbg:#dff0e0;--delbg:#f6dcd6;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#16161a;--panel:#1e1e23;--ink:#f1ece0;--mute:#9b958a;--gold:#c9a44c;--line:#2e2d33;--ok:#6cc08b;--bad:#e8806e;--mark:#5a4a1c;--num:#8fb0f0;--addbg:#1f3a2a;--delbg:#4a2622}}
+:root[data-theme="dark"]{--bg:#16161a;--panel:#1e1e23;--ink:#f1ece0;--mute:#9b958a;--gold:#c9a44c;--line:#2e2d33;--ok:#6cc08b;--bad:#e8806e;--mark:#5a4a1c;--num:#8fb0f0;--addbg:#1f3a2a;--delbg:#4a2622}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--bg);color:var(--ink);font-family:"Cairo",system-ui,"Segoe UI",Tahoma,sans-serif;line-height:1.7}
+.wrap{max-width:1040px;margin:0 auto;padding:20px 16px 48px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+h1{font-size:2rem;margin:0;font-weight:700;color:var(--gold)}
+.sub{color:var(--mute);margin:0;font-size:.95rem}
+.hb{display:flex;gap:8px}
+button{font:inherit;color:inherit}
+.btn{background:transparent;border:1px solid var(--line);border-radius:6px;padding:6px 14px;cursor:pointer}
+.btn:hover{border-color:var(--gold)}
+.btn.main{background:var(--gold);color:var(--bg);border-color:var(--gold);font-weight:600}
+.btn[aria-pressed=true]{border-color:var(--gold);color:var(--gold)}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+textarea,input[type=text]{width:100%;background:var(--panel);color:var(--ink);border:1px solid var(--line);border-radius:6px;padding:10px 12px;font:14px/1.6 ui-monospace,Consolas,monospace;direction:ltr;text-align:left;resize:vertical}
+textarea{min-height:150px}
+.smart{margin-bottom:16px}
+.smart textarea{min-height:56px;direction:inherit;unicode-bidi:plaintext;text-align:start;font-family:"Cairo",sans-serif}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:18px;overflow-x:auto}
+.tab{background:none;border:0;border-bottom:2px solid transparent;padding:10px 18px;cursor:pointer;color:var(--mute);white-space:nowrap}
+.tab[aria-selected=true]{color:var(--gold);border-color:var(--gold);font-weight:700}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:720px){.grid{grid-template-columns:1fr}}
+label.l{display:block;font-size:.85rem;color:var(--mute);margin-bottom:4px}
+.bar{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;align-items:center}
+.out,.tree{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:12px;min-height:150px;max-width:100%;overflow:auto;direction:ltr;text-align:left;font:14px/1.6 ui-monospace,Consolas,monospace}
+pre.out{margin:0;white-space:pre-wrap;word-break:break-word}
+.tree details{margin:0}.tree summary{cursor:pointer}
+.tree .ch{margin-inline-start:14px;border-inline-start:1px solid var(--line);padding-inline-start:12px}
+.k{color:var(--gold)}.mt{color:var(--mute)}.v.string{color:var(--ok)}.v.number{color:var(--num)}.v.boolean,.v.n{color:var(--bad)}
+.dl{display:flex;gap:8px;padding:0 10px;white-space:pre-wrap;word-break:break-word}.dl i{font-style:normal;width:1em;flex:none;color:var(--mute)}
+.add{background:var(--addbg)}.del{background:var(--delbg)}
+.msg{min-height:1.6em;font-size:.9rem;margin-top:8px}
+.ok{color:var(--ok)}.bad{color:var(--bad)}
+mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 1px}
+.kv{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:10px 12px;margin-bottom:10px}
+.kv b{color:var(--gold)}
+.opt{cursor:pointer;font-size:.9rem;margin-inline-end:10px}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div><h1>سِراج</h1><p class="sub" data-i="sub"></p></div>
+  <div class="hb">
+    <button class="btn main" id="install" data-i="install" hidden></button>
+    <button class="btn" id="lang">EN</button>
+    <button class="btn" id="theme" data-i="theme"></button>
+  </div>
+</header>
+
+<div class="smart">
+  <label class="l" for="smart" data-i="smartL"></label>
+  <textarea id="smart" data-ph="smartPh"></textarea>
+</div>
+
+<div class="tabs" role="tablist" id="tabs">
+  <button class="tab" role="tab" data-t="json" aria-selected="true">JSON</button>
+  <button class="tab" role="tab" data-t="jwt" aria-selected="false">JWT</button>
+  <button class="tab" role="tab" data-t="rx" aria-selected="false">Regex</button>
+  <button class="tab" role="tab" data-t="b64" aria-selected="false">Base64</button>
+  <button class="tab" role="tab" data-t="diff" aria-selected="false" data-i="tabDiff"></button>
+</div>
+
+<section id="p-json">
+  <div class="grid">
+    <div><label class="l" for="j-in" data-i="input"></label><textarea id="j-in" spellcheck="false"></textarea></div>
+    <div>
+      <label class="l" data-i="output"></label>
+      <pre class="out" id="j-out"></pre>
+      <div class="tree" id="j-tree" hidden></div>
+    </div>
+  </div>
+  <div class="bar">
+    <button class="btn main" id="j-fmt" data-i="fmt"></button>
+    <button class="btn" id="j-min" data-i="min"></button>
+    <button class="btn" id="j-sort" data-i="sort"></button>
+    <button class="btn" id="j-vt" aria-pressed="true" data-i="viewText"></button>
+    <button class="btn" id="j-vr" aria-pressed="false" data-i="viewTree"></button>
+    <button class="btn" id="j-ex" data-i="expand" hidden></button>
+    <button class="btn" id="j-co" data-i="collapse" hidden></button>
+    <button class="btn" data-copy="j-out" data-i="copy"></button>
+    <button class="btn" id="j-dl" data-i="download"></button>
+  </div>
+  <div class="msg" id="j-msg"></div>
+</section>
+
+<section id="p-jwt" hidden>
+  <label class="l" for="w-in" data-i="jwtL"></label>
+  <textarea id="w-in" spellcheck="false" style="min-height:90px"></textarea>
+  <div class="msg" id="w-msg"></div>
+  <div class="grid" style="margin-top:10px">
+    <div><label class="l" data-i="jwtHead"></label><pre class="out" id="w-h"></pre></div>
+    <div><label class="l" data-i="jwtPay"></label><pre class="out" id="w-p"></pre></div>
+  </div>
+  <p class="sub" style="margin-top:10px" data-i="jwtNote"></p>
+</section>
+
+<section id="p-rx" hidden>
+  <label class="l" for="r-pat" data-i="rxL"></label>
+  <input type="text" id="r-pat" placeholder="\b\w+@\w+\.com\b" spellcheck="false">
+  <div class="bar flags">
+    <label class="opt"><input type="checkbox" value="g" checked> <span data-i="fg"></span></label>
+    <label class="opt"><input type="checkbox" value="i"> <span data-i="fi"></span></label>
+    <label class="opt"><input type="checkbox" value="m"> <span data-i="fm"></span></label>
+    <label class="opt"><input type="checkbox" value="s"> <span data-i="fs"></span></label>
+  </div>
+  <div class="grid">
+    <div><label class="l" for="r-txt" data-i="rxText"></label><textarea id="r-txt" spellcheck="false"></textarea></div>
+    <div><label class="l" data-i="rxMatches"></label><pre class="out" id="r-out"></pre></div>
+  </div>
+  <div class="msg" id="r-msg"></div>
+  <div id="r-groups"></div>
+</section>
+
+<section id="p-b64" hidden>
+  <div class="grid">
+    <div><label class="l" for="b-in" data-i="input"></label><textarea id="b-in" spellcheck="false"></textarea></div>
+    <div><label class="l" data-i="output"></label><pre class="out" id="b-out"></pre></div>
+  </div>
+  <div class="bar">
+    <button class="btn main" id="b-enc" data-i="enc"></button>
+    <button class="btn main" id="b-dec" data-i="dec"></button>
+    <label class="opt"><input type="checkbox" id="b-url"> <span data-i="urlSafe"></span></label>
+    <button class="btn" data-copy="b-out" data-i="copy"></button>
+  </div>
+  <div class="msg" id="b-msg"></div>
+</section>
+
+<section id="p-diff" hidden>
+  <div class="grid">
+    <div><label class="l" for="d-a" data-i="diffA"></label><textarea id="d-a" spellcheck="false"></textarea></div>
+    <div><label class="l" for="d-b" data-i="diffB"></label><textarea id="d-b" spellcheck="false"></textarea></div>
+  </div>
+  <div class="bar">
+    <label class="opt"><input type="checkbox" id="d-json"> <span data-i="diffJson"></span></label>
+    <label class="opt"><input type="checkbox" id="d-trim"> <span data-i="diffTrim"></span></label>
+  </div>
+  <div class="msg" id="d-msg"></div>
+  <div class="out" id="d-out" style="padding:6px 0;margin-top:8px"></div>
+</section>
+</div>
+
+<script>
+const $=id=>document.getElementById(id);
+const store={get:k=>{try{return localStorage.getItem(k)}catch(e){return null}},set:(k,v)=>{try{localStorage.setItem(k,v)}catch(e){}}};
+
+/* ---------- i18n ---------- */
+const L={
+ar:{title:'سِراج — أدوات المطوّر',sub:'أدوات المطوّر في صفحة واحدة. كل شيء يعمل في متصفحك ولا يُرسل أي بيانات.',theme:'المظهر',install:'تثبيت التطبيق',
+smartL:'ألصق أي نص وسأختار الأداة المناسبة',smartPh:'JSON أو JWT أو Base64',tabDiff:'مقارنة',input:'المدخل',output:'الناتج',
+fmt:'تنسيق',min:'ضغط',sort:'ترتيب المفاتيح',copy:'نسخ الناتج',copied:'تم النسخ',copyFail:'تعذّر النسخ',download:'تحميل الملف',
+viewText:'نص',viewTree:'شجرة',expand:'فتح الكل',collapse:'طي الكل',jOk:'JSON صالح ✓',jErr:'خطأ في الصيغة: {m}',
+jwtL:'الصق الرمز (JWT)',jwtHead:'الرأس (Header)',jwtPay:'الحمولة (Payload)',jwtNote:'يفك الترميز فقط ولا يتحقق من صحة التوقيع.',
+jwtParts:'الرمز يجب أن يتكون من ثلاثة أجزاء مفصولة بنقطة',jwtBad:'تعذّر فك الرمز. تأكد أنه JWT كامل وصحيح',jwtIat:'صدر: {d}',
+jwtExpPast:'منتهي الصلاحية منذ {n} دقيقة ({d})',jwtExpFut:'ينتهي بعد {n} دقيقة ({d})',jwtNoExp:'تم فك الترميز. لا يوجد حقل exp.',
+rxL:'التعبير النمطي',fg:'g عام',fi:'i تجاهل الحالة',fm:'m أسطر متعددة',fs:'s النقطة تشمل السطر',rxText:'النص للاختبار',rxMatches:'المطابقات',
+rxCount:'عدد المطابقات: {n}',rxNone:'لا توجد مطابقات',rxBad:'تعبير غير صالح: {m}',rxGroup:'مطابقة {n}:',
+enc:'ترميز',dec:'فك الترميز',urlSafe:'صيغة URL الآمنة',encOk:'تم الترميز ✓',decOk:'تم فك الترميز ✓',encErr:'تعذّر الترميز',decErr:'المدخل ليس Base64 صالحاً أو لا يحوي نصاً UTF-8',
+diffA:'النص الأصلي',diffB:'النص المعدّل',diffJson:'معاملة المدخلات كـ JSON',diffTrim:'تجاهل المسافات',diffSame:'النصان متطابقان ✓',
+diffStat:'{a} أسطر مضافة، {r} أسطر محذوفة',diffJsonErr:'خطأ JSON في «{s}»: {m}',diffBig:'النص أكبر من الحد المسموح (2500 سطر)',raw:'{x}'},
+en:{title:'Siraj — Developer Tools',sub:'Developer tools in one page. Everything runs in your browser; no data is sent anywhere.',theme:'Theme',install:'Install app',
+smartL:'Paste anything and the right tool opens',smartPh:'JSON, JWT or Base64',tabDiff:'Diff',input:'Input',output:'Output',
+fmt:'Format',min:'Minify',sort:'Sort keys',copy:'Copy output',copied:'Copied',copyFail:'Copy failed',download:'Download file',
+viewText:'Text',viewTree:'Tree',expand:'Expand all',collapse:'Collapse all',jOk:'Valid JSON ✓',jErr:'Syntax error: {m}',
+jwtL:'Paste the token (JWT)',jwtHead:'Header',jwtPay:'Payload',jwtNote:'Decodes only; the signature is not verified.',
+jwtParts:'A JWT has three parts separated by dots',jwtBad:'Could not decode. Make sure it is a complete, valid JWT',jwtIat:'Issued: {d}',
+jwtExpPast:'Expired {n} min ago ({d})',jwtExpFut:'Expires in {n} min ({d})',jwtNoExp:'Decoded. There is no exp field.',
+rxL:'Regular expression',fg:'g global',fi:'i ignore case',fm:'m multiline',fs:'s dot matches newline',rxText:'Test text',rxMatches:'Matches',
+rxCount:'Matches: {n}',rxNone:'No matches',rxBad:'Invalid expression: {m}',rxGroup:'Match {n}:',
+enc:'Encode',dec:'Decode',urlSafe:'URL-safe format',encOk:'Encoded ✓',decOk:'Decoded ✓',encErr:'Could not encode',decErr:'Input is not valid Base64 or does not contain UTF-8 text',
+diffA:'Original',diffB:'Modified',diffJson:'Treat inputs as JSON',diffTrim:'Ignore whitespace',diffSame:'The texts are identical ✓',
+diffStat:'{a} lines added, {r} lines removed',diffJsonErr:'JSON error in “{s}”: {m}',diffBig:'Text exceeds the limit (2500 lines)',raw:'{x}'}};
+let lang=store.get('lang')||((navigator.language||'').startsWith('ar')?'ar':'en');
+const t=(k,p)=>(L[lang][k]||k).replace(/\{(\w+)\}/g,(_,x)=>p&&p[x]!=null?p[x]:'');
+const M={};
+const renderMsg=id=>{const e=$(id),m=M[id];e.textContent=m?t(m.k,m.p):'';e.className='msg '+(m?(m.ok?'ok':'bad'):'')};
+const say=(id,k,p,ok)=>{M[id]=k?{k,p,ok}:null;renderMsg(id)};
+function applyLang(){
+  const r=document.documentElement;r.lang=lang;r.dir=lang==='ar'?'rtl':'ltr';
+  document.querySelectorAll('[data-i]').forEach(e=>e.textContent=t(e.dataset.i));
+  document.querySelectorAll('[data-ph]').forEach(e=>e.placeholder=t(e.dataset.ph));
+  document.title=t('title');$('lang').textContent=lang==='ar'?'EN':'عربي';
+  Object.keys(M).forEach(renderMsg);jwtRun();diffRun();
+}
+$('lang').onclick=()=>{lang=lang==='ar'?'en':'ar';store.set('lang',lang);applyLang()};
+
+/* ---------- Common ---------- */
+const esc=s=>s.replace(/[&<>]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[c]));
+function showTab(k){
+  document.querySelectorAll('.tab').forEach(b=>b.setAttribute('aria-selected',b.dataset.t===k));
+  ['json','jwt','rx','b64','diff'].forEach(x=>$('p-'+x).hidden=x!==k);
+}
+$('tabs').addEventListener('click',e=>{const b=e.target.closest('.tab');if(b)showTab(b.dataset.t)});
+$('theme').onclick=()=>{
+  const r=document.documentElement;
+  const dark=r.dataset.theme?r.dataset.theme==='dark':matchMedia('(prefers-color-scheme:dark)').matches;
+  r.dataset.theme=dark?'light':'dark';
+};
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-copy]');if(!b)return;
+  const txt=$(b.dataset.copy).textContent;
+  (navigator.clipboard?navigator.clipboard.writeText(txt):Promise.reject()).then(()=>{b.textContent=t('copied')},()=>{b.textContent=t('copyFail')});
+  setTimeout(()=>b.textContent=t('copy'),1400);
+});
+function sortKeys(v){
+  if(Array.isArray(v))return v.map(sortKeys);
+  if(v&&typeof v==='object')return Object.keys(v).sort().reduce((o,k)=>(o[k]=sortKeys(v[k]),o),{});
+  return v;
+}
+
+/* ---------- JSON + Tree ---------- */
+let jMode='text';
+function treeNode(v,k,d){
+  const key=document.createElement('span');key.className='k';key.textContent=k===undefined?'':k+': ';
+  if(!v||typeof v!=='object'){
+    const row=document.createElement('div'),s=document.createElement('span');
+    s.className='v '+(v===null?'n':typeof v);s.textContent=JSON.stringify(v);row.append(key,s);return row;
+  }
+  const arr=Array.isArray(v),ks=Object.keys(v),dt=document.createElement('details'),sm=document.createElement('summary'),ch=document.createElement('div');
+  dt.open=d<2;ch.className='ch';
+  const c=document.createElement('span');c.className='mt';c.textContent=arr?`[${ks.length}]`:`{${ks.length}}`;
+  sm.append(key,c);
+  ks.slice(0,1000).forEach(x=>ch.append(treeNode(v[x],x,d+1)));
+  if(ks.length>1000){const m=document.createElement('div');m.className='mt';m.textContent='…';ch.append(m)}
+  dt.append(sm,ch);return dt;
+}
+function setJMode(m){
+  jMode=m;$('j-out').hidden=m!=='text';$('j-tree').hidden=m!=='tree';
+  $('j-ex').hidden=$('j-co').hidden=m!=='tree';
+  $('j-vt').setAttribute('aria-pressed',m==='text');$('j-vr').setAttribute('aria-pressed',m==='tree');
+}
+function jsonRun(mode){
+  const s=$('j-in').value,tr=$('j-tree');
+  tr.textContent='';
+  if(!s.trim()){$('j-out').textContent='';say('j-msg');return}
+  try{
+    let v=JSON.parse(s);
+    if(mode==='sort')v=sortKeys(v);
+    $('j-out').textContent=mode==='min'?JSON.stringify(v):JSON.stringify(v,null,2);
+    tr.append(treeNode(v,undefined,0));
+    say('j-msg','jOk',null,true);
+  }catch(err){$('j-out').textContent='';say('j-msg','jErr',{m:err.message})}
+}
+$('j-fmt').onclick=()=>jsonRun('fmt');$('j-min').onclick=()=>jsonRun('min');$('j-sort').onclick=()=>jsonRun('sort');
+$('j-in').addEventListener('input',()=>jsonRun('fmt'));
+$('j-vt').onclick=()=>setJMode('text');$('j-vr').onclick=()=>setJMode('tree');
+$('j-ex').onclick=()=>$('j-tree').querySelectorAll('details').forEach(d=>d.open=true);
+$('j-co').onclick=()=>$('j-tree').querySelectorAll('details').forEach(d=>d.open=false);
+$('j-dl').onclick=()=>{
+  const txt=$('j-out').textContent;if(!txt)return;
+  try{
+    const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([txt],{type:'application/json'}));
+    a.download='siraj.json';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  }catch(e){}
+};
+
+/* ---------- Base64 ---------- */
+function toB64(s,url){
+  let bin='';for(const b of new TextEncoder().encode(s))bin+=String.fromCharCode(b);
+  const r=btoa(bin);return url?r.replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,''):r;
+}
+function fromB64(s){
+  s=s.trim().replace(/-/g,'+').replace(/_/g,'/');while(s.length%4)s+='=';
+  return new TextDecoder('utf-8',{fatal:true}).decode(Uint8Array.from(atob(s),c=>c.charCodeAt(0)));
+}
+$('b-enc').onclick=()=>{try{$('b-out').textContent=toB64($('b-in').value,$('b-url').checked);say('b-msg','encOk',null,true)}catch(e){say('b-msg','encErr')}};
+$('b-dec').onclick=()=>{try{$('b-out').textContent=fromB64($('b-in').value);say('b-msg','decOk',null,true)}catch(e){$('b-out').textContent='';say('b-msg','decErr')}};
+
+/* ---------- JWT ---------- */
+const fmtT=s=>new Date(s*1000).toLocaleString(lang==='ar'?'ar':'en',{dateStyle:'medium',timeStyle:'medium'});
+function jwtRun(){
+  const s=$('w-in').value.trim();$('w-h').textContent=$('w-p').textContent='';
+  if(!s){say('w-msg');return}
+  const parts=s.split('.');
+  if(parts.length!==3){say('w-msg','jwtParts');return}
+  try{
+    const h=JSON.parse(fromB64(parts[0])),p=JSON.parse(fromB64(parts[1])),info=[];let ok=true;
+    $('w-h').textContent=JSON.stringify(h,null,2);$('w-p').textContent=JSON.stringify(p,null,2);
+    if(typeof p.iat==='number')info.push(t('jwtIat',{d:fmtT(p.iat)}));
+    if(typeof p.exp==='number'){
+      const left=p.exp*1000-Date.now();ok=left>=0;
+      info.push(t(ok?'jwtExpFut':'jwtExpPast',{n:Math.round(Math.abs(left)/60000),d:fmtT(p.exp)}));
+    }
+    info.length&&typeof p.exp==='number'?say('w-msg','raw',{x:info.join(' — ')},ok):say('w-msg','jwtNoExp',null,true);
+  }catch(e){say('w-msg','jwtBad')}
+}
+$('w-in').addEventListener('input',jwtRun);
+
+/* ---------- Regex ---------- */
+function rxRun(){
+  const pat=$('r-pat').value,txt=$('r-txt').value;
+  const flags=[...document.querySelectorAll('.flags input:checked')].map(i=>i.value).join('');
+  $('r-groups').textContent='';
+  if(!pat){$('r-out').innerHTML=esc(txt);say('r-msg');return}
+  let re;
+  try{re=new RegExp(pat,flags.includes('g')?flags:flags+'g')}catch(e){$('r-out').innerHTML=esc(txt);say('r-msg','rxBad',{m:e.message});return}
+  let out='',last=0,n=0;const list=[];
+  for(const m of txt.matchAll(re)){
+    if(n++>2000)break;
+    out+=esc(txt.slice(last,m.index))+'<mark>'+esc(m[0])+'</mark>';last=m.index+m[0].length;
+    if(m.length>1)list.push(m);
+  }
+  $('r-out').innerHTML=out+esc(txt.slice(last));
+  n?say('r-msg','rxCount',{n},true):say('r-msg','rxNone');
+  $('r-groups').innerHTML=list.slice(0,20).map((m,i)=>'<div class="kv"><b>'+t('rxGroup',{n:i+1})+'</b> <span dir="ltr">'+m.slice(1).map((g,j)=>'$'+(j+1)+' = '+esc(String(g))).join(' ، ')+'</span></div>').join('');
+}
+['r-pat','r-txt'].forEach(id=>$(id).addEventListener('input',rxRun));
+document.querySelector('.flags').addEventListener('change',rxRun);
+
+/* ---------- Diff ---------- */
+function diffLines(a,b){
+  const n=a.length,m=b.length,w=m+1,dp=new Uint16Array((n+1)*w);
+  for(let i=n-1;i>=0;i--)for(let j=m-1;j>=0;j--)
+    dp[i*w+j]=a[i]===b[j]?dp[(i+1)*w+j+1]+1:Math.max(dp[(i+1)*w+j],dp[i*w+j+1]);
+  const o=[];let i=0,j=0;
+  while(i<n&&j<m){
+    if(a[i]===b[j]){o.push([' ',a[i]]);i++;j++}
+    else if(dp[(i+1)*w+j]>=dp[i*w+j+1])o.push(['-',a[i++]]);
+    else o.push(['+',b[j++]]);
+  }
+  while(i<n)o.push(['-',a[i++]]);while(j<m)o.push(['+',b[j++]]);
+  return o;
+}
+function diffRun(){
+  const out=$('d-out'),a=$('d-a').value,b=$('d-b').value;out.textContent='';
+  if(!a&&!b){say('d-msg');return}
+  const prep=(s,side)=>{
+    if($('d-json').checked){try{s=JSON.stringify(sortKeys(JSON.parse(s)),null,2)}catch(e){throw{k:'diffJsonErr',p:{s:t(side),m:e.message}}}}
+    if($('d-trim').checked)s=s.split('\n').map(l=>l.trim().replace(/\s+/g,' ')).join('\n');
+    return s.split('\n');
+  };
+  let A,B;
+  try{A=prep(a,'diffA');B=prep(b,'diffB')}catch(e){say('d-msg',e.k,e.p);return}
+  if(A.length>2500||B.length>2500){say('d-msg','diffBig');return}
+  let add=0,del=0;const fr=document.createDocumentFragment();
+  diffLines(A,B).forEach(([s,x])=>{
+    const d=document.createElement('div'),i=document.createElement('i'),sp=document.createElement('span');
+    d.className='dl '+(s==='+'?'add':s==='-'?'del':'');
+    s==='+'?add++:s==='-'&&del++;
+    i.textContent=s===' '?'':s;sp.textContent=x||' ';d.append(i,sp);fr.append(d);
+  });
+  out.append(fr);
+  add||del?say('d-msg','diffStat',{a:add,r:del},true):say('d-msg','diffSame',null,true);
+}
+['d-a','d-b'].forEach(id=>$(id).addEventListener('input',diffRun));
+['d-json','d-trim'].forEach(id=>$(id).addEventListener('change',diffRun));
+
+/* ---------- Smart paste ---------- */
+$('smart').addEventListener('input',e=>{
+  const s=e.target.value.trim();if(!s)return;
+  if(/^eyJ[\w-]+\.[\w-]+\.[\w-]*$/.test(s)){showTab('jwt');$('w-in').value=s;jwtRun();return}
+  if(/^[\[{]/.test(s)){try{JSON.parse(s);showTab('json');$('j-in').value=s;jsonRun('fmt');return}catch(_){}}
+  if(/^[A-Za-z0-9+/_-]{8,}={0,2}$/.test(s)){showTab('b64');$('b-in').value=s;$('b-dec').click()}
+});
+
+/* ---------- PWA ---------- */
+(function(){
+  try{
+    // Only on a real http(s) origin (GitHub Pages, localhost). Skipped in previews/file://.
+    if(!/^https?:$/.test(location.protocol)||!/^https?:/.test(location.href))return;
+    const icon='data:image/svg+xml,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><rect width="512" height="512" rx="96" fill="#16161a"/><circle cx="256" cy="256" r="170" fill="none" stroke="#c9a44c" stroke-width="24"/><path d="M256 130c40 60 70 90 70 140a70 70 0 0 1-140 0c0-50 30-80 70-140z" fill="#c9a44c"/></svg>');
+    const add=(rel,href)=>{const l=document.createElement('link');l.rel=rel;l.href=href;document.head.append(l)};
+    add('icon',icon);add('apple-touch-icon',icon);
+    try{
+      const base=new URL('./',location.href).href;
+      const mf={name:'Siraj — Developer Tools',short_name:'Siraj',start_url:base,scope:base,display:'standalone',background_color:'#16161a',theme_color:'#16161a',icons:[{src:icon,sizes:'any',type:'image/svg+xml',purpose:'any'}]};
+      add('manifest',URL.createObjectURL(new Blob([JSON.stringify(mf)],{type:'application/manifest+json'})));
+    }catch(e){}
+    try{
+      if('serviceWorker' in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
+    }catch(e){}
+    let ev;
+    addEventListener('beforeinstallprompt',e=>{e.preventDefault();ev=e;$('install').hidden=false});
+    $('install').onclick=()=>{try{if(ev){ev.prompt();ev=null;$('install').hidden=true}}catch(e){}};
+    addEventListener('appinstalled',()=>{$('install').hidden=true});
+  }catch(e){}
+})();
+
+/* ---------- Init ---------- */
+$('j-in').value='{"name":"Siraj","tools":["json","jwt","regex","base64","diff"],"local":true,"meta":{"offline":true,"version":2}}';
+$('r-pat').value='\\b[\\w.]+@(\\w+)\\.com\\b';
+$('r-txt').value='dev@example.com, team@siraj.com';
+$('b-in').value='Hello, Siraj';
+$('d-a').value='{"name":"Siraj","version":1,"tools":["json","jwt"]}';
+$('d-b').value='{"name":"Siraj","version":2,"tools":["json","jwt","diff"]}';
+$('d-json').checked=true;
+jsonRun('fmt');rxRun();applyLang();
+</script>
+</body>
+</html>
